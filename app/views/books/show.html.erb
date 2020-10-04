@@ -2,7 +2,7 @@
 <div class="row">
 	<div class="col-xs-3">
 		<%= render "layouts/errors", obj: @user %>
-		
+
 		<h2>User info</h2>
 		<%= render 'users/profile' %>
 
@@ -24,12 +24,61 @@
 					</td>
 					<td><%= link_to @book.title, book_path(@book) %></td>
 					<td><%= @book.body %></td>
+				<!-- いいね機能 -->
+					<% if @book.favorited_by?(current_user) %>
+					<td>
+					  <%= link_to book_favorites_path(@book), method: :delete do %>
+					    <i class="fa fa-heart" aria-hidden="true"></i>
+					    <%= @book.favorites.count %>
+					  <% end %>
+					</td>
+					<% else %>
+					<td>
+					  <%= link_to book_favorites_path(@book), method: :post do %>
+					    <i class="fa fa-heart-o" aria-hidden="true"></i>
+					    <%= @book.favorites.count %>
+					  <% end %>
+					</td>
+					<% end %>
+				<!--コメント数 -->
+					<td>コメント数：<%= @book.post_comments.count %></td>
 					<td><% if @book.user_id == current_user.id %>
 						　<%= link_to "Edit", edit_book_path(@book), class: "btn-sm btn-success edit_book_#{@book.id}" %></td>
 					<td><%= link_to "Destroy", book_path(@book), method: :delete, data: {confirm: "本当に削除してもよろしいですか？"}, class: "btn-sm btn-danger destroy_book_#{@book.id}" %></td>
 							<% end %>
 				</tr>
 			</table>
+
+<!--コメント本文 -->
+  <% @book.post_comments.each do |post_comment| %>
+    <div class="comment">
+        <span class="avatar">
+            <%= attachment_image_tag(@book.user, :profile_image, :fill, 100, 100, fallback: "no-image-mini.jpg") %>
+        </span>
+        <span class="comment-text"><%= post_comment.comment %></span>
+         <!--削除機能 -->
+        <% if post_comment.user == current_user %>
+        <span>
+            <%= link_to "Destroy", book_post_comment_path(post_comment.book, post_comment), method: :delete, class: "btn-sm btn-danger" %>
+        </span>
+            <% end %>
+
+        <div class="comment-author">
+        <%= post_comment.user.name %>
+        </div>
+    </div>
+
+  <% end %>
+
+  <!--コメント投稿フォーム -->
+  <%= form_with(model:[@book, @post_comment], local: true) do |f| %>
+  <div class="row">
+    <div class="col-sm-12">
+      <%= f.text_area :comment, rows:'5', class: "form-control" %>
+    </div>
+  </div>
+  <%= f.submit "送信", class: "btn pull-right" %>
+<% end %>
 
 	</div>
 </div>
