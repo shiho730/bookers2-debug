@@ -4,34 +4,46 @@
       	<h2>User info</h2>
         <%= render 'users/profile', user: current_user %>
 
-		<h2>New book</h2>
-		<%= render 'books/form', book: @book %>
-	</div>
+				<h2>New book</h2>
+				<%= render 'books/form', book: @book %>
+　	</div>
 
-<div class="col-xs-9">
-	<h2>Users</h2>
-<!--users一覧 -->
-	<table class="table">
-	<thead>
-		<tr>
-			<th>image</th>
-			<th>name</th>
-			<th colspan="3"></th>
-		</tr>
-	</thead>
+		<div class="col-xs-9">
+			<h2>Users</h2>
+			<!--users一覧 -->
+			<table class="table">
+			<thead>
+				<tr>
+					<th>image</th>
+					<th>name</th>
+		　　	<th colspan="3"></th>
+	　　	</tr>
+　　	</thead>
 
-	<tbody>
-		<% @users.each do |user| %>
-		<tr>
+　　	<tbody>
+	　	<% @users.each do |user| %>
+	　	<tr>
 			<td><%= attachment_image_tag user, :profile_image, :fill, 50, 50, fallback: "no-image-mini.jpg" %></td>
 			<td><%= user.name %></td>
+			<!--フォロー数 -->
+			<td>フォロー数：<%= user.follower.count %></td>
+			<!--フォロワー数 -->
+			<td>フォロワー数：<%= user.followed.count %></td>
+			<!--フォローする、外す -->
+			<td>
+			<% if current_user.following?(user) %>
+        <%= link_to 'フォロー外す', user_relationships_path(user.id), method: :delete %>
+      <% else %>
+        <%= link_to 'フォローする', user_relationships_path(user.id), method: :post %>
+      <% end %>
+			</td>
 			<td><%= link_to "Show", user_path(user.id), class: "user_#{user.id}" %></td>
-		</tr>
-		<% end %>
-	</tbody>
-	</table>
-	</div>
+		  </tr>
+	   <% end %>
+	   </tbody>
+	   </table>
+  	</div>
   </div>
 </div>
-<!--users一覧 -->
+
 
